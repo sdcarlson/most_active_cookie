@@ -1,0 +1,51 @@
+#!/usr/bin/python3
+
+import sys
+from datetime import datetime
+
+
+def help():
+    print(f"Usage: python3 most_active_cookie <csv_file> -d \"yyyy-mm-dd\"\n\nWill return most active cookie in <csv_file> for date inputted")
+
+
+# Check if the correct form of arguments are given, if not return help message
+if len(sys.argv) != 4 or sys.argv[2] != '-d':
+    help()
+    exit(1)
+
+
+# Initialize dictionary to store each cookie with number of occurrences
+cookies_occurrences = {}
+
+# Open csv file in read mode
+log = open(sys.argv[1], "r")
+
+# Convert given date into datetime object
+date_time = datetime.strptime(sys.argv[3], "%Y-%m-%d")
+
+# Loop through csv file line by line
+for line in log.readlines():
+    cookie, timestamp = line.split(",")
+    # Remove newline at end of timestamp
+    timestamp = timestamp.replace("\n", "")
+    # Convert timestamp into datetime object
+    tmp_datetime = datetime.strptime(timestamp, '%Y-%m-%dT%H:%M:%S%z')
+    if date_time.strftime('%Y-%m-%d') == tmp_datetime.strftime('%Y-%m-%d'):
+        # If the cookie is already in the dictionary, increment occurences
+        if cookie in cookies_occurrences:
+            cookies_occurrences[cookie] += 1
+        else:
+            # If the cookie is not yet in the dictionary, add it with 1 occurence
+            cookies_occurrences[cookie] = 1
+
+
+# Get max value in the dictionary
+maxval = max(cookies_occurrences.values(), key=lambda x: x)
+
+# Print the cookie(s) which appeared the most
+for cookie, occurrences in cookies_occurrences.items():
+    if occurrences == maxval:
+        print(cookie)
+
+# Close the file
+log.close()
